@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Locker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            text-align: center;
+            padding: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+            font-size: 24px;
+        }
+        button {
+            padding: 12px 25px;
+            font-size: 18px;
+            background-color: #2980b9;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+            width: 100%;
+            max-width: 300px;
+        }
+        button:hover {
+            background-color: #3498db;
+        }
+        .form-container {
+            display: none;
+            margin-top: 20px;
+        }
+        .form-container label {
+            font-size: 18px;
+            margin-right: 10px;
+        }
+        input[type="text"] {
+            padding: 10px;
+            font-size: 16px;
+            margin-right: 10px;
+            width: calc(100% - 20px); /* 保证输入框在移动设备上适应屏幕 */
+            max-width: 300px;
+        }
+        form {
+            margin-top: 20px;
+        }
+        /* 适配手机端 */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            h1 {
+                font-size: 22px;
+            }
+            button {
+                padding: 10px 20px;
+                font-size: 16px;
+            }
+            .form-container label, input[type="text"] {
+                font-size: 16px;
+            }
+            input[type="text"] {
+                width: 100%;
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to Smart Locker System</h1>
+
+    <h2>Please Choose an Option</h2>
+    <div id="buttons">
+        <button onclick="showForm('save')">Save Image</button>
+        <button onclick="showForm('verify')">Verify Image</button>
+    </div>
+
+    <div class="form-container" id="saveForm">
+        <h2>Save Image</h2>
+        <form action="/capture" method="POST">
+            <label for="user_id_save">Enter User ID:</label>
+            <input type="text" id="user_id_save" name="user_id" required>
+            <button type="submit">Save and Capture Face</button>
+        </form>
+        <button onclick="goBack()">Back</button>
+    </div>
+
+    <div class="form-container" id="verifyForm">
+        <h2>Verify Image</h2>
+        <form action="/unlock" method="POST">
+            <label for="user_id_verify">Enter User ID:</label>
+            <input type="text" id="user_id_verify" name="user_id" required>
+            <button type="submit">Verify and Unlock</button>
+        </form>
+        <button onclick="goBack()">Back</button>
+    </div>
+
+    <script>
+        function showForm(formType) {
+            document.getElementById("saveForm").style.display = "none";
+            document.getElementById("verifyForm").style.display = "none";
+
+            if (formType === 'save') {
+                document.getElementById("saveForm").style.display = "block";
+            } else if (formType === 'verify') {
+                document.getElementById("verifyForm").style.display = "block";
+            }
+
+            // 隐藏最初的按钮
+            document.getElementById("buttons").style.display = "none";
+        }
+
+        function goBack() {
+            // 显示保存和校验的按钮
+            document.getElementById("buttons").style.display = "block";
+
+            // 隐藏表单
+            document.getElementById("saveForm").style.display = "none";
+            document.getElementById("verifyForm").style.display = "none";
+        }
+    </script>
+</body>
+</html>

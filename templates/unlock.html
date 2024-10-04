@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unlock Locker</title>
+    <style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        color: #333;
+        text-align: center;
+        padding: 50px;
+        display: flex; /* 使用 Flexbox 布局 */
+        justify-content: center; /* 水平居中 */
+        align-items: center; /* 垂直居中 */
+        height: 100vh; /* 设置 body 的高度为视口高度 */
+        margin: 0; /* 移除默认的外边距 */
+        flex-direction: column; /* 让内容纵向排列 */
+    }
+    h1 {
+        color: #2c3e50;
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    img {
+        border: 5px solid #2980b9;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        width: 100%;  /* 确保图片宽度自适应 */
+        max-width: 640px; /* 设置图片的最大宽度 */
+        height: auto; /* 保持宽高比 */
+    }
+    button {
+        padding: 12px 25px;
+        font-size: 18px;
+        background-color: #2980b9;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 20px;
+        width: 100%;
+        max-width: 300px;
+    }
+    button:hover {
+        background-color: #3498db;
+    }
+    form {
+        margin-top: 20px;
+    }
+    .back{
+        background-color: aqua;
+     }
+
+    /* 适配手机端 */
+    @media (max-width: 768px) {
+        body {
+            padding: 10px;
+        }
+        h1 {
+            font-size: 22px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+        .button_wrap {
+        display: flex;             /* 启用 Flexbox 布局 */
+        flex-direction: column;    /* 将子元素垂直排列 */
+        justify-content: center;   /* 垂直方向居中 */
+        align-items: center;       /* 水平方向居中 */
+        gap: 20px;                 /* 子元素之间的间距 */
+        height: 100vh;             /* 设置容器高度为视口高度，确保居中 */
+        }
+        img {
+            max-width: 100%;
+            height: auto; /* 确保图片的高度根据宽度自动调整 */
+        }
+    }
+</style>
+
+
+</head>
+<body>
+    <h1>Face Verification for User: {{ user_id }}</h1>
+
+    <!-- 视频流图片 -->
+    <img src="{{ url_for('video_feed') }}" alt="Face Verification Video Feed">
+
+    <!-- 成功消息显示 -->
+    {% if message %}
+        <div style="color: green; font-weight: bold;">{{ message }}</div>
+    {% endif %}
+
+    <!-- 音频控件 -->
+    <audio id="successAudio">
+        <source src="{{ url_for('static', filename='audio/verify_success.mp3') }}" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    <audio id="failAudio">
+        <source src="{{ url_for('static', filename='audio/verify_fail.mp3') }}" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    <!-- 表单用于验证并解锁 -->
+    <div class="button_wrap">
+        <form action="/validate_face" method="POST">
+        <button type="submit">Verify and Unlock</button>
+    </form>
+
+    <!-- 返回主页的按钮 -->
+    <form action="/" method="GET">
+        <button type="submit" class="back">Back to Home</button>
+    </form>
+    </div>
+
+    <script>
+         // 获取传递的消息
+        var message = "{{ message }}";
+
+        // 检测消息是否是验证成功
+        if (message.includes("Successfully")) {
+            // 播放音频
+            var audio = document.getElementById("successAudio");
+            audio.play();
+        }
+         if (message.includes("failed")){
+            var audio = document.getElementById("failAudio");
+            audio.play();
+        }
+    </script>
+</body>
+</html>

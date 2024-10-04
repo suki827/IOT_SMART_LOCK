@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capture Face</title>
+    <style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        color: #333;
+        text-align: center;
+        padding: 50px;
+        display: flex; /* 使用 Flexbox 布局 */
+        justify-content: center; /* 水平居中 */
+        align-items: center; /* 垂直居中 */
+        height: 100vh; /* 设置 body 的高度为视口高度 */
+        margin: 0; /* 移除默认的外边距 */
+        flex-direction: column; /* 让内容纵向排列 */
+    }
+
+    h1 {
+        color: #2c3e50;
+        margin-bottom: 20px;
+        font-size: 24px; /* 默认字体大小 */
+    }
+
+    img {
+        border: 5px solid #2980b9;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        width: 100%;  /* 确保图片宽度自适应 */
+        max-width: 640px; /* 设置图片的最大宽度 */
+        height: auto; /* 保持宽高比 */
+    }
+
+    form {
+        margin-top: 20px;
+    }
+
+    button {
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #2980b9;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        width: 100%; /* 按钮宽度自适应 */
+        max-width: 300px; /* 设置最大宽度，确保按钮不会太宽 */
+    }
+
+    button:hover {
+        background-color: #3498db;
+    }
+
+    button:focus {
+        outline: none;
+    }
+
+    .back{
+        color: aqua;
+    }
+    .button_wrap {
+        display: flex;             /* 启用 Flexbox 布局 */
+        flex-direction: column;    /* 将子元素垂直排列 */
+        justify-content: center;   /* 垂直方向居中 */
+        align-items: center;       /* 水平方向居中 */
+        gap: 20px;                 /* 子元素之间的间距 */
+        height: 100vh;             /* 设置容器高度为视口高度，确保居中 */
+    }
+
+    /* 手机端适配 */
+    @media (max-width: 768px) {
+        body {
+            padding: 10px; /* 减少边距以适配小屏幕 */
+        }
+
+        h1 {
+            font-size: 20px; /* 调整标题字体大小 */
+        }
+
+        img {
+            max-width: 100%; /* 在小屏幕上让图片占满可用空间 */
+            height: auto; /* 保持图片比例 */
+        }
+
+        button {
+            padding: 8px 16px; /* 调整按钮的内边距 */
+            font-size: 14px; /* 调整按钮字体大小 */
+        }
+    }
+</style>
+
+</head>
+<body>
+    <h1>Capture Face for User: {{ user_id }}</h1>
+
+    <!-- 显示摄像头的实时视频 -->
+    <img src="{{ url_for('video_feed') }}" width="640" height="480" alt="Live Camera Feed">
+
+    {% if message %}
+        <div style="color: green; font-weight: bold;">{{ message }}</div>
+    {% endif %}
+    <audio id="successAudio">
+        <source src="{{ url_for('static', filename='audio/save_success.mp3') }}" type="audio/mpeg">
+<!--        <source src="http://192.168.4.1:5001/static/audio/save_success.mp3" type="audio/mpeg">-->
+        Your browser does not support the audio element.
+    </audio>
+    <!-- 表单用于提交保存图像 -->
+    <div class="button_wrap">
+        <form action="/save_face" method="POST">
+        <button type="submit" class="back">Save Face Image</button>
+    </form>
+
+    <!-- 新增返回主页的按钮 -->
+    <form action="/" method="GET">
+        <button type="submit">Back to Home</button>
+    </form>
+    </div>
+    <script>
+         // 获取传递的消息
+        var message = "{{ message }}";
+        debugger
+        // 检测消息是否是验证成功
+        if (message. includes('Successfully')) {
+            // 播放音频
+            var audio = document.getElementById("successAudio");
+            audio.play();
+        }else {
+            // var audio = document.getElementById("failAudio");
+            // audio.play();
+        }
+    </script>
+</body>
+</html>
