@@ -10,7 +10,7 @@ class MQTTClient:
         :param port: MQTT 服务器端口，默认1883
         :param access_token: 设备的访问令牌（可选，用于身份验证）
         """
-        THINGSBOARD_HOST = 'mqtt.thingsboard.cloud'
+        THINGSBOARD_HOST = 'mqttself.thingsboard.cloud'
         ACCESS_TOKEN = 'jy4wh03el0cs5rm53syn'
         self.host = THINGSBOARD_HOST
         self.port = port
@@ -105,7 +105,7 @@ class MQTTClient:
 if __name__ == "__main__":
     # 初始化 MQTT 客户端，连接到服务器
 
-    THINGSBOARD_HOST = 'mqtt.thingsboard.cloud'
+    THINGSBOARD_HOST = 'mqttself.thingsboard.cloud'
     ACCESS_TOKEN = 'jy4wh03el0cs5rm53syn'
     mqtt_client = MQTTClient()
 

@@ -5,7 +5,7 @@ import time
 import RPi.GPIO as GPIO  # 导入 GPIO 库
 
 # 配置 ThingsBoard 的主机和 Access Token
-THINGSBOARD_HOST = 'mqtt.thingsboard.cloud'
+THINGSBOARD_HOST = 'mqttself.thingsboard.cloud'
 ACCESS_TOKEN = 'jy4wh03el0cs5rm53syn'
 
 # 设置蜂鸣器引脚

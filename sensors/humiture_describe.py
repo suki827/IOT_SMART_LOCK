@@ -1,10 +1,10 @@
 
 import json
 
-from mqtt.mqtt_client import MQTTClient
+from mqttself.mqtt_client import MQTTClient
 
 # MQTT 服务器配置
-MQTT_HOST = "mqtt.thingsboard.cloud"  # 替换为你的 MQTT 服务器
+MQTT_HOST = "mqttself.thingsboard.cloud"  # 替换为你的 MQTT 服务器
 ACCESS_TOKEN = "your_access_token"  # 替换为你的设备访问令牌
 TOPIC = "v1/devices/me/telemetry"  # 订阅的主题
 
