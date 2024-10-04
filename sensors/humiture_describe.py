@@ -1,7 +1,7 @@
 
 import json
 
-from mqtt.mqtt_client import MQTTClient
+from mqtt import mqtt_client
 
 # MQTT 服务器配置
 MQTT_HOST = "mqtt.thingsboard.cloud"  # 替换为你的 MQTT 服务器
@@ -40,7 +40,7 @@ def on_message(client, userdata, msg):
 
 
 # 初始化 MQTT 客户端
-mqtt_client = MQTTClient()
+mqtt_client = mqtt_client.MQTTClient()
 
 # 绑定回调函数
 mqtt_client.on_connect = on_connect
