@@ -1,11 +1,11 @@
-from mqttself import mqttClient
+from mqttself.mqttClient import MQTTClient
 from sensors import Humiture
 import Adafruit_DHT
 import time
 
 
 # 初始化 MQTT 客户端
-mqtt_client = mqttClient.MQTTClient()
+mqtt_client = MQTTClient()
 
 # 初始化温湿度传感器，使用 DHT11 连接 GPIO 4（物理引脚 7）
 humiture_sensor = Humiture.HumitureSensor(Adafruit_DHT.DHT11, 4)
