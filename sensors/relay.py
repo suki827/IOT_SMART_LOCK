@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import platform
-import pinConfig
+from sensors import pinConfig
 
 import time
 if platform.system() == 'Linux':  # 仅在树莓派上导入 RPi.GPIO

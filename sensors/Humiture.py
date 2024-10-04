@@ -1,7 +1,7 @@
 import time
 
 import Adafruit_DHT
-import pinConfig
+from sensors import pinConfig
 class HumitureSensor:
     def __init__(self, sensor_type, pin):
         """
