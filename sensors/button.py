@@ -3,13 +3,15 @@ import platform
 import subprocess
 import time
 import socket
+from sensors import pinConfig
+
 if platform.system() == 'Linux':  # 仅在树莓派上导入 RPi.GPIO
     import RPi.GPIO as GPIO
 else:
     print("Not running on Raspberry Pi, GPIO not available")
 
 # 设置按钮引脚
-button_pin = 12
+button_pin = pinConfig.PIN_CONFIG['button']
 
 # 初始化GPIO
 GPIO.setmode(GPIO.BOARD)

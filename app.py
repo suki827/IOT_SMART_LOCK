@@ -1,30 +1,41 @@
 import time
-import face_recognition
 import pygame
-from flask import Flask, render_template, Response, request, redirect, url_for
+from flask import Flask, render_template, Response, request
 import cv2
 import os
 
 from functions.face import verify_face
-import functions.relay
-# import functions.Display as display
+import sensors.relay
 import platform
+
+from functions.logger import DataLogger
+
+logger = DataLogger('my_data_log.log')
+
 
 app = Flask(__name__)
 lcd = None
 system_path = '.'
 if platform.system() == 'Linux':  #仅在树莓派上导入 RPi.GPIO
-    import RPi.GPIO as GPIO
+    # import RPi.GPIO as GPIO
     system_path = '/home/pi/iot'
-    relay = functions.relay.RelayController(pin=11)
-    # lcd = display.I2CLCD(address=0x3f)  # 将地址改为检测到的I2C地址
-    # lcd.clear()
-    # lcd.lcd_string("Please connect Wi-Fi", lcd.LCD_LINE_1)
-    # lcd.lcd_string("RaspberryPi_AP", lcd.LCD_LINE_2)
+    relay = sensors.relay.RelayController(pin=11)
+    lcd = Display.I2CLCD(address=0x3f)  # 将地址改为检测到的I2C地址
+    lcd.clear()
+    lcd.lcd_string("Please connect Wi-Fi", lcd.LCD_LINE_1)
+    lcd.lcd_string("RaspberryPi_AP", lcd.LCD_LINE_2)
 
 
 else:
     print("Not running on Raspberry Pi, GPIO not available")
+
+user_map = {
+    '1': 'Nick',
+    '2': 'Hugo',
+    '3': 'Honey',
+    '4': 'Habilash'
+}
+
 
 app = Flask(__name__)
 
@@ -78,7 +89,7 @@ def index():
 def capture_form():
     global user_id
     user_id = request.form['user_id']
-    return render_template('capture.html', user_id=user_id)
+    return render_template('capture.html', user_id=user_id, user_name=user_map[user_id])
 
 
 def play_audio(file_path):
@@ -150,14 +161,16 @@ def save_face():
     success, frame = camera.read()
     if success and user_id:
         save_face_image(user_id, frame)
-        message = f"Face Image Saved  Successfully For User ID {user_id}."
+        message = f"User {user_map[user_id]} face Image Saved  Successfully."
         # 播放音频
         play_audio(system_path + '/static/audio/save_success.mp3')
         clearLcdMessage()
-        lcdMessage('save image success')
+        lcdMessage(f'{user_map[user_id]} save  success')
         return render_template('capture.html', message=message)
     else:
-        message = "Failed to save face image."
+        clearLcdMessage()
+        lcdMessage(f'{user_map[user_id]} save  fail')
+        message = f"User {user_map[user_id]} face Image Saved  fail."
         return render_template('capture.html', message=message)
 
 
@@ -166,7 +179,7 @@ def unlock_form():
     global user_id
     camera_manager.release_camera()  # 确保摄像头资源被释放
     user_id = request.form['user_id']
-    return render_template('unlock.html', user_id=user_id)
+    return render_template('unlock.html', user_id=user_id,user_name=user_map[user_id])
 
 
 @app.route('/validate_face', methods=['POST'])
@@ -184,20 +197,22 @@ def validate_face():
             verify_path = save_face_image(user_id, frame, folder='verify')
             result = verify_face(user_id, stored_image_path, verify_path)
             if result:
-                # if relay:
-                #     relay.relay_on()
-                #     time.sleep(2)
-                #     relay.relay_off()
+                if relay:
+                    relay.relay_on()
+                    time.sleep(2)
+                    relay.relay_off()
                 clearLcdMessage()
-                lcdMessage('Verifying Successfully')
-                message = f"User {user_id} verified Successfully, unlocking locker!"
+                lcdMessage(f'{user_map[user_id]} Verify Successfully')
+                message = f"User {user_map[user_id]} verified Successfully, unlocking locker!"
                 # 播放音频
                 play_audio(system_path + '/static/audio/verify_success.mp3')
+
+                logger.log_info('')
                 return render_template('unlock.html', message=message)
             else:
                 clearLcdMessage()
-                lcdMessage('Verifying Fail')
-                message = "Face Does Not match, access denied. Try again."
+                lcdMessage(f'{user_map[user_id]} Verify Fail')
+                message = f"User {user_map[user_id]} Face Does Not match, access denied. Try again."
                 play_audio(system_path + '/static/audio/verify_fail.mp3')
                 return render_template('unlock.html', message=message)
         else:

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import platform
+import pinConfig
 
 import time
 if platform.system() == 'Linux':  # 仅在树莓派上导入 RPi.GPIO
@@ -8,8 +9,8 @@ else:
     print("Not running on Raspberry Pi, GPIO not available")
 
 class RelayController:
-    def __init__(self, pin):
-        self.RelayPin = pin
+    def __init__(self):
+        self.RelayPin = pinConfig.PIN_CONFIG['relay']
         # 初始化 GPIO 设置
         GPIO.setmode(GPIO.BOARD)
         GPIO.setwarnings(False)
