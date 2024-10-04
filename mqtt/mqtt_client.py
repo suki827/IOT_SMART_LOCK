@@ -97,6 +97,9 @@ class MQTTClient:
         """
         print("Disconnected from MQTT broker")
 
+    def loop_forever(self):
+        """启动事件循环，保持连接和接收消息"""
+        self.client.loop_forever()
 
 # 使用示例
 if __name__ == "__main__":

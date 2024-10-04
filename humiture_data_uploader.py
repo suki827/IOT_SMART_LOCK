@@ -3,9 +3,6 @@ from sensors import Humiture
 import Adafruit_DHT
 import time
 
-# 配置 MQTT 服务器信息
-MQTT_HOST = 'mqtt.thingsboard.cloud'
-ACCESS_TOKEN = 'your_access_token'  # 替换为你的设备访问令牌
 
 # 初始化 MQTT 客户端
 mqtt_client = mqtt_client.MQTTClient()
