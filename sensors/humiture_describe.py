@@ -1,7 +1,7 @@
 
 import json
 
-from mqttself.mqtt_client import MQTTClient
+from mqttself.mqttClient import MQTTClient
 
 # MQTT 服务器配置
 MQTT_HOST = "mqttself.thingsboard.cloud"  # 替换为你的 MQTT 服务器
