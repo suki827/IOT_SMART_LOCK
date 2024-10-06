@@ -1,16 +1,16 @@
 import time
 
 import Adafruit_DHT
-from sensors import pinConfig
 class HumitureSensor:
-    def __init__(self, sensor_type, pin):
+    def __init__(self, sensor_type):
         """
         初始化温湿度传感器
         :param sensor_type: 传感器类型（DHT11 或 DHT22）
-        :param pin: 传感器连接的 GPIO 引脚
+        :param pin: 传感器连接的 GPIO 引脚 # 'humiture': 4,  # 物理引脚 7 对应 GPIO 4
         """
         self.sensor_type = sensor_type
-        self.pin = pinConfig.PIN_CONFIG['humiture']
+        self.pin = 4
+
 
     def read_data(self):
         """

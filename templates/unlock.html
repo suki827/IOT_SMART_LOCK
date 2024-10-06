@@ -84,7 +84,8 @@
 
 </head>
 <body>
-    <h1>Face Verification for User: {{ user_id }}</h1>
+    <h1>Face Verification for User: {{ user_name }}</h1>
+    <h1 hidden="hidden">Face Verification for User: {{ user_id }}</h1>
 
     <!-- 视频流图片 -->
     <img src="{{ url_for('video_feed') }}" alt="Face Verification Video Feed">

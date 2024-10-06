@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import platform
-from sensors import pinConfig
 
 import time
 if platform.system() == 'Linux':  # 仅在树莓派上导入 RPi.GPIO
@@ -10,12 +9,13 @@ else:
 
 class RelayController:
     def __init__(self):
-        self.RelayPin = pinConfig.PIN_CONFIG['relay']
+        # 'relay': 16,  # 物理引脚 16 对应 GPIO 23
+        self.RelayPin = 16
         # 初始化 GPIO 设置
         GPIO.setmode(GPIO.BOARD)
         GPIO.setwarnings(False)
         GPIO.setup(self.RelayPin, GPIO.OUT)
-        GPIO.output(self.RelayPin, GPIO.HIGH)
+        GPIO.output(self.RelayPin, GPIO.LOW)
 
     # 打开继电器
     def relay_on(self):
@@ -35,17 +35,17 @@ class RelayController:
         print("GPIO cleanup complete")
 
 # 测试代码，使用时可以实例化 RelayController 类并调用相关方法
-if __name__ == '__main__':
-    # 实例化继电器控制器，使用物理引脚 11
-    relay = RelayController(pin=11)
-
-    try:
-        # 模拟条件触发继电器
-        time.sleep(2)  # 等待 2 秒
-        relay.relay_on()  # 打开继电器
-        time.sleep(5)  # 等待 5 秒
-        relay.relay_off()  # 关闭继电器
-    except KeyboardInterrupt:
-        print("Program interrupted")
-    finally:
-        relay.cleanup()  # 清理 GPIO
+# if __name__ == '__main__':
+#     # 实例化继电器控制器，使用物理引脚 11
+#     relay = RelayController(pin=11)
+#
+#     try:
+#         # 模拟条件触发继电器
+#         time.sleep(2)  # 等待 2 秒
+#         relay.relay_on()  # 打开继电器
+#         time.sleep(5)  # 等待 5 秒
+#         relay.relay_off()  # 关闭继电器
+#     except KeyboardInterrupt:
+#         print("Program interrupted")
+#     finally:
+#         relay.cleanup()  # 清理 GPIO

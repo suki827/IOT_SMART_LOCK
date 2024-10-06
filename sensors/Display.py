@@ -29,7 +29,6 @@ class I2CLCD:
         self.lcd_byte(0x0C, self.LCD_CMD)  # 关闭光标
         self.lcd_byte(0x28, self.LCD_CMD)  # 设置两行显示模式
         self.lcd_byte(0x01, self.LCD_CMD)  # 清屏
-        self.lcd_string("Hello Smart Locker!", self.LCD_LINE_1)
         time.sleep(self.E_DELAY)
 
     def lcd_byte(self, bits, mode):
@@ -62,18 +61,26 @@ class I2CLCD:
         self.lcd_byte(0x0C, self.LCD_CMD)  # 重置显示
 
     def lcd_off(self):
-        """关闭LCD背光"""
+        """关闭LCD背光并清除显示的文字"""
         self.backlight = 0x00  # 清除背光位
-        self.lcd_byte(0x0C, self.LCD_CMD)  # 重置显示
+
+        # 清除显示的文字（调用清屏方法）
+        self.clear()  # 假设你有一个 'clear()' 方法可以用来清屏
+
+        # 或者发送空白字符以覆盖文字
+        self.lcd_byte(0x01, self.LCD_CMD)  # 0x01 是清屏命令
+
+        # 重置显示
+        self.lcd_byte(bits=0x0C, mode=self.LCD_CMD)
 
 
 # 创建LCD对象并显示内容
 lcd = I2CLCD(address=0x3f)  # 将地址改为检测到的I2C地址
 
-lcd.lcd_string("Hello, World!", lcd.LCD_LINE_1)
-lcd.lcd_string("Raspberry Pi", lcd.LCD_LINE_2)
+lcd.lcd_string("Hello", lcd.LCD_LINE_1)
+lcd.lcd_string("Smart Locker!", lcd.LCD_LINE_2)
 
-time.sleep(3)
+time.sleep(5)
 
 # 清屏
 lcd.clear()

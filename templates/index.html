@@ -49,6 +49,14 @@
         form {
             margin-top: 20px;
         }
+        .info{
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            color: #298B95;
+            font-size: 18px;
+            font-weight: bold;
+        }
         /* 适配手机端 */
         @media (max-width: 768px) {
             body {
@@ -73,11 +81,14 @@
 </head>
 <body>
     <h1>Welcome to Smart Locker System</h1>
-
+    <div class='info'>
+        <p>Temperature：{{ temperature }}°C</p>
+        <p>Humidity：{{ humidity }}%</p>
+    </div>
     <h2>Please Choose an Option</h2>
     <div id="buttons">
-        <button onclick="showForm('save')">Save Image</button>
-        <button onclick="showForm('verify')">Verify Image</button>
+        <button onclick="showForm('save')">Book</button>
+        <button onclick="showForm('verify')">Unlock</button>
     </div>
 
     <div class="form-container" id="saveForm">
@@ -85,7 +96,7 @@
         <form action="/capture" method="POST">
             <label for="user_id_save">Enter User ID:</label>
             <input type="text" id="user_id_save" name="user_id" required>
-            <button type="submit">Save and Capture Face</button>
+            <button type="submit">Capture Face</button>
         </form>
         <button onclick="goBack()">Back</button>
     </div>
@@ -99,8 +110,17 @@
         </form>
         <button onclick="goBack()">Back</button>
     </div>
+     {% if user_name %}
+        <div style="color: green; font-weight: bold;">The Box is booked by {{ user_name }}  </div>
+    {% endif %}
+    <script type="text/javascript">
 
-    <script>
+
+       // 在 JavaScript 中获取嵌入的后端数据
+        var userName = "{{ user_name }}";
+        if(userName != null){
+
+        }
         function showForm(formType) {
             document.getElementById("saveForm").style.display = "none";
             document.getElementById("verifyForm").style.display = "none";

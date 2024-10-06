@@ -96,7 +96,9 @@
 
 </head>
 <body>
-    <h1>Capture Face for User: {{ user_id }}</h1>
+    <h1>Capture Face for User: {{ user_name }}</h1>
+    <h1 hidden="hidden"> {{ user_id }}</h1>
+
 
     <!-- 显示摄像头的实时视频 -->
     <img src="{{ url_for('video_feed') }}" width="640" height="480" alt="Live Camera Feed">
@@ -123,7 +125,7 @@
     <script>
          // 获取传递的消息
         var message = "{{ message }}";
-        debugger
+
         // 检测消息是否是验证成功
         if (message. includes('Successfully')) {
             // 播放音频
