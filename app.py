@@ -17,7 +17,6 @@ from sensors import Display
 
 logger = DataLogger('verify_data_log.log')
 
-
 now = datetime.now()
 now_date_time = now.strftime("%Y-%m-%d %H:%M:%S")
 print("格式化后的日期和时间:", now_date_time)
@@ -37,6 +36,7 @@ system_path = '.'
 relay = None
 if platform.system() == 'Linux':  #仅在树莓派上导入 RPi.GPIO
     import RPi.GPIO as GPIO
+
     system_path = '/home/pi/iot'
     relay = sensors.relay.RelayController()
     lcd = Display.I2CLCD(address=0x3f)  # 将地址改为检测到的I2C地址
@@ -65,6 +65,7 @@ def read_humiture_data():
             return data
     except FileNotFoundError:
         return {'temperature': None, 'humidity': None}
+
 
 # 摄像头管理类，确保单例摄像头实例
 class CameraManager:
@@ -111,13 +112,15 @@ def index():
     humidity = json_data['humidity']
     temperature = json_data['temperature']
     camera_manager.release_camera()  # 确保摄像头资源被释放
-    return render_template('index.html', humidity=humidity ,temperature=temperature)
+    return render_template('index.html', humidity=humidity, temperature=temperature)
+
 
 def image_exists(image_file):
     # 检查图片文件是否存在
     imgs_path = os.path.join(os_path, 'faces')
     flag = image_file in os.listdir(imgs_path)
     return flag
+
 
 @app.route('/capture', methods=['POST'])
 def capture_form():
@@ -128,14 +131,12 @@ def capture_form():
     file_path = f'{user_id}.jpg'
     list = os.listdir(imgs_path)
     print(f"==========={list}=============")
-
     flag = image_exists(file_path)
-
-    print(f'========={flag}============')
     if len(list) > 0 or flag:
         name = list[0].split('.')[0]
         return render_template('index.html', user_id=user_id, user_name=user_map[name])
-    else: return render_template('capture.html', user_id=user_id, user_name=user_map[user_id])
+    else:
+        return render_template('capture.html', user_id=user_id, user_name=user_map[user_id])
 
 
 def play_audio(file_path):
@@ -198,7 +199,7 @@ def save_face_image(user_id, frame, folder='faces'):
 
 @app.route('/save_face', methods=['POST'])
 def save_face():
-    global user_id, book_flag, lockCount,relay
+    global user_id, book_flag, lockCount, relay
     camera = camera_manager.get_camera()
 
     if not camera.isOpened():
@@ -223,7 +224,6 @@ def save_face():
         lockCount += 1
         relay.relay_off()
 
-
         print(f'--save success-----lockCount------{lockCount}----- book_flag---{book_flag}------')
         return render_template('capture.html', message=message)
     else:
@@ -238,12 +238,12 @@ def unlock_form():
     global user_id
     camera_manager.release_camera()  # 确保摄像头资源被释放
     user_id = request.form['user_id']
-    return render_template('unlock.html', user_id=user_id,user_name=user_map[user_id])
+    return render_template('unlock.html', user_id=user_id, user_name=user_map[user_id])
 
 
 @app.route('/validate_face', methods=['POST'])
 def validate_face():
-    global user_id,book_flag,unlockCount
+    global user_id, book_flag, unlockCount
     camera = camera_manager.get_camera()
 
     if not camera.isOpened():
@@ -257,7 +257,6 @@ def validate_face():
             result = verify_face(user_id, stored_image_path, verify_path)
             if result:
                 if relay:
-
                     relay.relay_on()
                     clearLcdMessage()
                     lcdMessage(f'{user_map[user_id]}', 'Verify Successfully')
@@ -277,7 +276,7 @@ def validate_face():
                 return render_template('unlock.html', message=message)
             else:
                 clearLcdMessage()
-                lcdMessage(f'{user_map[user_id]}','Verify Fail')
+                lcdMessage(f'{user_map[user_id]}', 'Verify Fail')
                 message = f"User {user_map[user_id]} Face Does Not match, access denied. Try again."
                 play_audio(system_path + '/static/audio/verify_fail.mp3')
                 logger.log_info(f'{now_date_time} - User {user_map[user_id]} verified Fail')
@@ -289,6 +288,7 @@ def validate_face():
         message = "Failed to validate face."
         return render_template('unlock.html', message=message)
 
+
 button_pin = 12  # 物理引脚 12 对应 GPIO 18
 
 # 初始化GPIO
@@ -298,11 +298,13 @@ if platform.system() == 'Linux':
 
 # 初始化全局变量
 app_process = None
+stop_thread = False
 button_pressed_time = None  # 用来记录按钮按下的时间
 last_press_time = 0  # 上次按钮按下的时间
 click_count = 0  # 按钮按下的次数
 double_click_time_threshold = 0.5  # 双击的时间阈值（秒）
 long_press_threshold = 3  # 长按时间阈值（秒）
+
 
 def start_flask_service():
     """ 启动 Flask 服务 """
@@ -312,27 +314,31 @@ def start_flask_service():
         # 使用多进程启动 Flask 服务
         app_process = threading.Thread(target=run_flask)
         app_process.start()
-        time.sleep(15)  # 等待服务启动
+        time.sleep(10)  # 等待服务启动
         if is_port_in_use(5001):
             print("Service is running!")
         else:
             print("Service failed to start.")
 
+
 def run_flask():
     """ 运行 Flask 服务 """
     app.run(host='0.0.0.0', port=5001, debug=False)
 
+
 def stop_flask_service():
     """ 停止 Flask 服务 """
-    global app_process
+    global app_process, stop_thread
     if app_process is not None:
         print("Stopping Flask service...")
-        os.kill(os.getpid(), signal.SIGTERM)  # 发送终止信号
-        app_process.join()  # 等待进程终止
+        # 通过信号停止 Flask 的线程
+        # pid = app_process.pid
+        os.kill(os.getpid(), signal.SIGINT)  # 发送 SIGINT 信号
+        stop_thread = True
+        app_process.join()
         app_process = None
-        clearLcdMessage()
-        lcdMessage(f'closing')
-        print("Flask service stopped.")
+        print(f"Flask service stopped.=========={app_process}=======")
+
 
 def handle_double_click():
     """ 处理双击事件，启动服务 """
@@ -342,16 +348,32 @@ def handle_double_click():
     else:
         print("Service is already running.")
 
+
 def handle_long_press():
     """ 处理长按事件，停止服务 """
     if app_process is not None:
+        print("button keep press")
+        lc = lockCount
+        ulc = unlockCount
+        print(f"LockCount============={lc}")
+        print(f"UnlockCount============={ulc}")
+        countData = {
+            'LockCount': lc,
+            'UnlockCount': ulc
+        }
+        if lc == 0 and ulc == 0:
+            print("No lock data to upload")
+        else:
+            client.push_telemetry(countData)
+            print("lock data pushed successfully.")
+
+        time.sleep(2)
         print('显示屏关闭')
         lcd.lcd_off()
         stop_flask_service()
-
-
     else:
         print("Service is not running.")
+
 
 def is_port_in_use(port=5001):
     """ 检查指定端口是否正在监听 """
@@ -360,25 +382,22 @@ def is_port_in_use(port=5001):
         result = sock.connect_ex(('127.0.0.1', port))
         return result == 0  # 返回 True 表示端口被占用，False 表示未占用
 
+
 def button_event_loop():
     """ 按钮事件循环，处理双击和长按 """
-    global button_pressed_time, last_press_time, click_count
-
+    global button_pressed_time, last_press_time, click_count, stop_thread
+    print(f'============{stop_thread}================')
     try:
         while True:
             input_state = GPIO.input(button_pin)
             if input_state == 0:  # 按钮被按下时，检测低电平
                 if button_pressed_time is None:
-
-
                     button_pressed_time = time.time()  # 记录按下的起始时间
             else:
                 if button_pressed_time is not None:
                     press_duration = time.time() - button_pressed_time
-
                     if press_duration >= long_press_threshold:  # 检查是否是长按
                         handle_long_press()
-
                     elif press_duration < 0.5:  # 检查是否是短按
                         current_time = time.time()
                         if current_time - last_press_time <= double_click_time_threshold:
@@ -390,9 +409,6 @@ def button_event_loop():
                         if click_count == 2:  # 处理双击事件（启动服务）
                             handle_double_click()
                             click_count = 0  # 重置计数
-                            # clearLcdMessage()
-                            # lcdMessage(f'Starting')
-
                 button_pressed_time = None  # 重置按下时间
 
             time.sleep(0.1)  # 防止按钮抖动
@@ -400,30 +416,41 @@ def button_event_loop():
         GPIO.cleanup()  # 清理GPIO设置
 
 
-
 if __name__ == '__main__':
     # 在一个单独的线程中运行按钮事件循环
     if platform.system() == 'Linux':
         button_thread = threading.Thread(target=button_event_loop)
-        button_thread.daemon = True
+        button_thread.daemon = True  # 按钮线程不作为守护线程，以确保它持续运行
         button_thread.start()
-        print("Button thread started successfully.")
+        print("Button thread started successfully. Double-click can start web service")
 
     try:
-        print("Attempting to start Flask application...")
-        # 启动 Flask 应用程序
-        app.run(host='0.0.0.0', port=5001, debug=True)
-        print("Flask application started successfully.")
+        # print("Attempting to start Flask application...")
+        # # 启动 Flask 应用程序
+        # app.run(host='0.0.0.0', port=5001, debug=True)
+        # print("Flask application started successfully.")
 
+        while True:
+            time.sleep(1)
     except Exception as e:
         print(f"Main thread error: {e}")
-
-    finally:
-        data = {
-            'LockCount': lockCount,
-            'UnlockCount': unlockCount
+    except KeyboardInterrupt:
+        print("Main loop interrupted.")
+        lc = lockCount
+        ulc = unlockCount
+        print(f"LockCount============={lc}")
+        print(f"UnlockCount============={ulc}")
+        countData = {
+            'LockCount': lc,
+            'UnlockCount': ulc
         }
-        client.push_telemetry(data)
+        if lc == 0 and ulc == 0:
+            print("No lock data to upload")
+        else:
+            client.push_telemetry(countData)
+            print("lock data pushed successfully.")
+    finally:
+        stop_thread = True
         if lcd:
             print('显示屏关闭')
             lcd.lcd_off()  # 确保 LCD 关闭
