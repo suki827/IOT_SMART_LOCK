@@ -30,6 +30,9 @@ app = Flask(__name__)
 # 定义全局变量
 lockCount = 0
 unlockCount = 0
+
+successCount = 0
+failCount = 0
 book_flag = False
 lcd = None
 system_path = '.'
@@ -243,7 +246,7 @@ def unlock_form():
 
 @app.route('/validate_face', methods=['POST'])
 def validate_face():
-    global user_id, book_flag, unlockCount
+    global user_id, book_flag, unlockCount,successCount,failCount
     camera = camera_manager.get_camera()
 
     if not camera.isOpened():
@@ -271,10 +274,12 @@ def validate_face():
                 # 删除图片 只保证里面有一张图片
                 os.remove(stored_image_path)
                 unlockCount += 1
+                successCount += 1
                 message = f"User {user_map[user_id]} verified Successfully, unlocking locker!"
                 print(f'--verify success-----unlockCount------{unlockCount}----- book_flag---{book_flag}------')
                 return render_template('unlock.html', message=message)
             else:
+                failCount += 1
                 clearLcdMessage()
                 lcdMessage(f'{user_map[user_id]}', 'Verify Fail')
                 message = f"User {user_map[user_id]} Face Does Not match, access denied. Try again."
@@ -361,6 +366,16 @@ def handle_long_press():
             'LockCount': lc,
             'UnlockCount': ulc
         }
+        verifyData = {
+            'success': successCount,
+            'fail': failCount
+        }
+        if successCount == 0 and failCount == 0:
+            print("No verify  data to upload")
+        else:
+            client.push_telemetry(verifyData)
+            print("lock data pushed successfully.")
+
         if lc == 0 and ulc == 0:
             print("No lock data to upload")
         else:
@@ -448,6 +463,16 @@ if __name__ == '__main__':
             print("No lock data to upload")
         else:
             client.push_telemetry(countData)
+            print("lock data pushed successfully.")
+
+        verifyData = {
+            'success': successCount,
+            'fail': failCount
+        }
+        if successCount == 0 and failCount == 0:
+            print("No verify  data to upload")
+        else:
+            client.push_telemetry(verifyData)
             print("lock data pushed successfully.")
     finally:
         stop_thread = True
